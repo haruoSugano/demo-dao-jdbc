@@ -3,13 +3,14 @@ package model.entities;
 import java.io.Serializable;
 
 public class Department implements Serializable{
-	
-	
+	//implements "Serializable", nosso objetos podendo ser transformados em sequencia de bytes
+	//Precisa ser implementado quand, ela e guardado em arquivos trafegado em redes
 	private static final long serialVersionUID = 1L;
+	
 	private Integer id;
 	private String name;
 	
-	public Department() {
+	public Department() {//construtor padrao
 	}
 
 	public Department(Integer id, String name) {
@@ -32,13 +33,13 @@ public class Department implements Serializable{
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	//hashCode and equals 
+	//Para que meus objetos, possam ser comparado pelo conteudo e nao pela referencia de ponteiro
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
 
@@ -56,18 +57,12 @@ public class Department implements Serializable{
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
 		return true;
 	}
-
+	//Facilidade em imprimir valores, na hora do teste
 	@Override
 	public String toString() {
 		return "Department [id=" + id + ", name=" + name + "]";
 	}
-
-
+	
 }
