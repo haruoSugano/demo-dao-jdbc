@@ -92,40 +92,79 @@ public class SellerDaoJDBC implements SellerDao{//SellerDaoJDBC implementacao do
 
 	@Override
 	public List<Seller> findAll() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<Seller> findByDepartment(Department department) {
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try{
-			st = conn.prepareStatement(
+			st = conn.prepareStatement(//Importante no final de cada linha dar um espaco, se nao, causa erro
+					"SELECT seller.*,department.Name as DepName "//vai buscar todos os vendedores e departamento
+					+"FROM seller INNER JOIN department "//fazer inner join
+					+"ON seller.DepartmentId = department.Id "
+					+"ORDER BY Name ");//ordenar por nome
+			
+			rs = st.executeQuery();
+			
+			List<Seller> list = new ArrayList<>();
+			Map<Integer, Department> map = new HashMap<>();//Criar uma estrutura Map vazia
+			//Guarudar neste map qualquer departamento que instanciar, cada vez que passar pelo while, ele faz o teste se o departament existe
+			
+			while(rs.next()) {//Percorrer o resultSet enquanto estiver o proximo
+				//Para cada valor do resultSet
+				
+				Department dep = map.get(rs.getInt("DepartmentId"));//testar se o departamento ja existe
+			//Faz o teste se departamento existe/ map.get busca o departamento que tem rs.getInt("DepartmentId")
+				//Significa que esta buscando dentro o map se existe o departamento escolhido, se for null instancia o departamento
+				
+				if (dep == null) {//Controle para nao repetir departamento
+					dep = instantiateDepartment(rs);//precisa instanciar o departamento
+					map.put(rs.getInt("DepartmentId"), dep);//guarda o departamento instanciado
+				}
+				
+				Seller obj = instantiateSeller(rs, dep);//instanciar o vendedor
+				list.add(obj);//adicionar o vendedor na lista
+			}
+			return list;
+		}
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());//lancar minha excessao personalizada
+		}
+		finally {//fehcando meus recursos
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);
+		}
+	}
+
+	@Override
+	public List<Seller> findByDepartment(Department department) {//Como sao varios valores, precisa ser lista
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try{
+			st = conn.prepareStatement(//Importante no final de cada linha dar um espaco, se nao, causa erro
 					"SELECT seller.*,department.Name as DepName "
 					+"FROM seller INNER JOIN department "
 					+"ON seller.DepartmentId = department.Id "
 					+"WHERE DepartmentId = ? "
 					+"ORDER BY Name ");
 			
-			st.setInt(1,department.getId());
+			st.setInt(1,department.getId());// ? e o id do departamento department.getId
 			
 			rs = st.executeQuery();
 			
 			List<Seller> list = new ArrayList<>();
-			Map<Integer, Department> map = new HashMap<>();
+			Map<Integer, Department> map = new HashMap<>();//Criar uma estrutura Map vazia
+			//Guarudar neste map qualquer departamento que instanciar, cada vez que passar pelo while, ele faz o teste se o departament existe
 			
-			while(rs.next()) {
-				
-				Department dep = map.get(rs.getInt("DepartmentId"));
-				
-				if (dep == null) {
-					dep = instantiateDepartment(rs);
-					map.put(rs.getInt("DepartmentId"), dep);
+			while(rs.next()) {//Percorrer o resultSet enquanto estiver o proximo
+				//Para cada valor do resultSet
+				Department dep = map.get(rs.getInt("DepartmentId"));//testar se o departamento ja existe
+			//Faz o teste se departamento existe/ map.get busca o departamento que tem rs.getInt("DepartmentId")
+				//Significa que esta buscando dentro o map se existe o departamento escolhido, se for null instancia o departamento
+				if (dep == null) {//Controle para nao repetir departamento
+					dep = instantiateDepartment(rs);//precisa instanciar o departamento
+					map.put(rs.getInt("DepartmentId"), dep);//guarda o departamento instanciado
 				}
 				
-				Seller obj = instantiateSeller(rs, dep);
-				list.add(obj);
+				Seller obj = instantiateSeller(rs, dep);//instanciar o vendedor
+				list.add(obj);//adicionar o vendedor na lista
 			}
 			return list;
 		}
