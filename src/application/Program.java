@@ -2,6 +2,7 @@ package application;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Scanner;
 
 import model.dao.DaoFactory;
 import model.dao.SellerDao;
@@ -11,6 +12,8 @@ import model.entities.Seller;
 public class Program {
 
 	public static void main(String[] args) {
+		
+		Scanner sc = new Scanner(System.in);
 
 		//Dessa forma o programa nao reconhece a implementacao, ela reconhece apenas a interface
 		SellerDao sellerDao = DaoFactory.createSellerDao();//e uma forma de fazer a injecao de independecia, sem explicitar a implementacao
@@ -42,6 +45,15 @@ public class Program {
 		seller.setName("Martha waine");
 		sellerDao.update(seller);
 		System.out.println("Update completed");
+		
+		System.out.println("=== TEST 6: seller delete ====");
+		System.out.println("Enter id for delete test: ");
+		int id = sc.nextInt();
+		sellerDao.deleteByIde(id);
+		
+		System.out.println("Delete completed");
+		
+		sc.close();
 	}
 
 }
